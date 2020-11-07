@@ -70,7 +70,7 @@ def showup(update, context):
         if j.scheduler.get_job(str(user_id)):
             text = "Anda sudah mulai"
         else:
-            j.scheduler.add_job(call, "interval", hour=5, args=(user_id,), id=str(user_id))
+            j.scheduler.add_job(call, "interval", hours=5, args=(user_id,), id=str(user_id))
             text = "Memulai"
         update.message.reply_text(text)
     else:
@@ -97,6 +97,9 @@ def delme(update, context):
         text = "Anda sudah tidak mengikuti"
     update.message.reply_text(text, reply_markup=KeyboardMarkup(reply_markup))
 
+def file(update, context):
+    update.message.reply_document(open("botme/new.db", "rb"))
+
 def alll(update, context):
     update.message.reply_text("Gunakan perintah yang tersedia")
 
@@ -106,6 +109,7 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.text("Berhenti mengikuti"), delme, run_async=True))
     dispatcher.add_handler(MessageHandler(Filters.text("Mulai"), showup, run_async=True))
     dispatcher.add_handler(CallbackQueryHandler(from_call, pattern=r"call_", run_async=True))
+    dispatcher.add_handler(CommandHandler("upload", file, run_async=True))    
     dispatcher.add_handler(MessageHandler(Filters.all, alll, run_async=True))
     
     updater.start_polling(timeout=15, read_latency=4)
