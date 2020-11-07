@@ -108,7 +108,7 @@ def main():
     dispatcher.add_handler(CallbackQueryHandler(from_call, pattern=r"call_", run_async=True))
     dispatcher.add_handler(MessageHandler(Filters.all, alll, run_async=True))
     
-    updater.start_polling()
+    updater.start_polling(timeout=15, read_latency=4)
     logger.info("Listening using polling")
     updater.idle()
 
