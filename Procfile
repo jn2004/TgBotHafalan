@@ -1,1 +1,1 @@
-worker:python3 -m botme
+worker: python3 -m botme
