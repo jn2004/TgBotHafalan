@@ -1,9 +1,10 @@
 import os
 import logging
 
-from telegram.ext import Updater
+from telegram import ParseMode
+from telegram.ext import Updater, Defaults
 
-from apscheduler.schedulers.background import BackgroundScheduler
+from pytz import timezone
 
 from botme.config import TOKEN
 
@@ -11,7 +12,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-updater = Updater(token=TOKEN)
+defaults = Defaults(parse_mode=ParseMode.MARKDOWN, tzinfo=timezone("Asia/Jakarta"))
+updater = Updater(token=TOKEN, defaults=defaults)
 dispatcher = updater.dispatcher
-j = updater.job_queue
-j.scheduler = BackgroundScheduler(timezone="Asia/Jakarta")
+j = updater.job_queue.scheduler
