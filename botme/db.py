@@ -2,7 +2,7 @@ import sqlite3
 import random
 import base64
 
-import mysql.connector
+import psycopg2
 
 from telegram import InlineKeyboardMarkup as Markup
 
@@ -11,11 +11,11 @@ from botme.costum import Button
 class Database:
     
     def __init__(self):
-        self.connect = mysql.connector.connect(
-            host="127.0.0.1",
-            user="jordi",
-            password="admin",
-            database="user"
+        self.connect = psycopg2.connect(
+            host="ec2-54-237-155-151.compute-1.amazonaws.com",
+            user="xkpckogpdxvslg",
+            password="5c99eb9300a66c724dfafb22ae66d06abe0f5905650bd7a1568d4a19056d1120",
+            database="dbjpj802sk4jrn"
         )
         self.cursor = self.connect.cursor()
     
@@ -100,12 +100,12 @@ class Database:
         db = sqlite3.connect("botme/new.db")
 
         for i in db.cursor().execute(sql % no):
-            latin = base64.b64encode(i[0].encode())
+            # latin = base64.b64encode(i[0].encode())
             sql = """
                 INSERT INTO process_users(user_id, surah, no)
-                VALUES (%d, "%s", %s) """
+                VALUES (%d, '%s', %s) """ % (user_id, i[0], no)
 
-        self.cursor.execute(sql % (user_id, latin, no))
+        self.cursor.execute(sql)
         self.connect.commit()
     
     def successful(self, user_id, status):
@@ -117,7 +117,7 @@ class Database:
         result = self.cursor.fetchone()
         sql2 = """
             INSERT INTO result_users(user_id, surah, no, status)
-            VALUES (%d, "%s", %d, "%s") """
+            VALUES (%d, '%s', %d, '%s') """
         sql3 = """
             DELETE FROM process_users
             WHERE user_id = %d """

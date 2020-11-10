@@ -48,8 +48,8 @@ def from_call(update, context):
         db.successful(user_id, "sudah")
         text = ""
         for i in sorted(db.check_result(user_id)):
-            latin = base64.b64decode(i[1].strip("b''")).decode()
-            text += f"`No     => {i[0]}\nSurah  => {latin}\nStatus => {i[2]}`\n\n"
+            # latin = base64.b64decode(i[1].strip("b''")).decode()
+            text += f"`No     => {i[0]}\nSurah  => {i[1]}\nStatus => {i[2]}`\n\n"
         query.edit_message_text(text)
         if j.get_job(str(user_id)):
             j.resume_job(str(user_id))  
