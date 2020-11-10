@@ -40,6 +40,7 @@ class Database:
         self.cursor.execute(t1)
         self.cursor.execute(t2)
         self.cursor.execute(t3)
+        self.connect.commit()
 
     def check_proses(self, user_id):
         sql = """
@@ -47,7 +48,8 @@ class Database:
             FROM process_users 
             WHERE user_id = %d """
         self.cursor.execute(sql % user_id)
-        return self.cursor.fetchone()
+        r = self.cursor.fetchone()
+        return r
 
     def check_result(self, user_id):
         sql = """
@@ -72,7 +74,6 @@ class Database:
                 sql += " NOT LIKE " + str(i[0])  
             else:    
                 sql += " AND no NOT LIKE " + str(i[0])
-        
         db = sqlite3.connect("botme/new.db")
         surah = [i for i in db.cursor().execute(sql)]
         button = list(
