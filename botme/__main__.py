@@ -10,10 +10,11 @@ from botme.db import db
 from botme.costum import Button, KeyboardMarkup
 
 def call(user_id):
-    if db.check_proses(user_id):
+    ps = db.check_proses(user_id)
+    if ps:
         reply_markup = Markup([[Button("Ya", "call_ya"), Button("Tidak", "call_tidak")]])
         updater.bot.send_message(chat_id=user_id,
-                                 text="Sudah apa belum?",
+                                 text=f"Sudah apa belum menghafal surah {ps[1]}?",
                                  reply_markup=reply_markup)
         if j.get_job(str(user_id)):
             j.pause_job(str(user_id))
@@ -133,7 +134,7 @@ def main():
     dispatcher.add_handler(CommandHandler("upload", file, run_async=True))    
     dispatcher.add_handler(MessageHandler(Filters.all, alll, run_async=True))
     
-    updater.start_polling(timeout=15, read_latency=4)
+    updater.start_polling()
     logger.info("Listening using polling")
     updater.idle()
 

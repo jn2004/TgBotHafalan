@@ -48,8 +48,7 @@ class Database:
             FROM process_users 
             WHERE user_id = %d """
         self.cursor.execute(sql % user_id)
-        r = self.cursor.fetchone()
-        return r
+        return self.cursor.fetchone()
 
     def check_result(self, user_id):
         sql = """
