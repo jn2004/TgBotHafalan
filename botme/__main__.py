@@ -74,8 +74,9 @@ def on(update, context):
 
 def showup(update, context):
     user_id = update.effective_user.id
-    call(user_id)
     if db.getme(user_id):
+        if user_id in [1328007524, 1399167510]:
+            call(user_id)
         if j.get_job(str(user_id)):
             text = "Anda sudah mulai"
         else:
@@ -83,7 +84,7 @@ def showup(update, context):
             text = "Memulai"
         update.message.reply_text(text)
     else:
-        update.message.reply_text("user_id tidak terdaftar")
+        update.message.reply_text("`user_id` tidak terdaftar")
 
 def startall(update, context):
     user_id = update.effective_user.id
