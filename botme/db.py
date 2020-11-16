@@ -1,6 +1,5 @@
-import sqlite3
 import random
-import base64
+import sqlite3
 
 import psycopg2
 
@@ -18,7 +17,6 @@ class Database:
             database="dbjpj802sk4jrn",
         )
         self.connect.set_session(autocommit=True)
-
         self.cursor = self.connect.cursor()
 
     def table(self):
@@ -39,9 +37,16 @@ class Database:
                 no INT,
                 status VARCHAR(10)
             )"""
+        t4 = """
+            CREATE TABLE IF NOT EXISTS respons (
+                user_id INT,
+                total INT
+            )
+        """
         self.cursor.execute(t1)
         self.cursor.execute(t2)
         self.cursor.execute(t3)
+        self.cursor.execute(t4)
 
     def check_proses(self, user_id):
         self.cursor.execute(
@@ -159,6 +164,34 @@ class Database:
     def getid(self):
         self.cursor.execute("SELECT * FROM process_users")
         return self.cursor.fetchone()
+
+    def respons(self, user_id, delete=False):
+        if delete:
+            self.cursor.execute(
+                f"""
+                DELETE FROM respons
+                WHERE user_id = {user_id} """
+            )
+        else:
+            self.cursor.execute(
+                f"""
+                SELECT total FROM respons
+                WHERE user_id = {user_id} """
+            )
+            total = self.cursor.fetchone()
+            if total:
+                self.cursor.execute(
+                    f"""
+                    UPDATE respons SET total = {int(total[0])+1}
+                    WHERE user_id = {user_id}"""
+                )
+                if int(total[0]) > 5:
+                    return True
+            else:
+                self.cursor.execute(
+                    f"""INSERT INTO respons
+                    VALUES({user_id}, 1)"""
+                )
 
 
 db = Database()

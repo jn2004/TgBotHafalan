@@ -30,9 +30,7 @@ def call(user_id):
         if j.get_job(str(user_id)):
             j.pause_job(str(user_id))
     else:
-        reply_markup = Markup(
-            [[Button("OK", "call_ok"), Button("NO", "call_no")]]
-        )
+        reply_markup = Markup([[Button("OK", "call_ok"), Button("NO", "call_no")]])
         updater.bot.send_message(
             chat_id=user_id,
             text="Luangkan waktu untuk menghafal Al-Quran ya",
@@ -56,19 +54,22 @@ def from_call(update, context):
         query.answer()
 
     if result == "tidak":
-        query.edit_message_text("ya")
+        msg = query.edit_message_text("ya")
         if j.get_job(str(user_id)):
+            if db.respons(user_id):
+                msg.delete()
+                query.message.reply_text("Tolong disiplin!")
+                print("hai")
             j.resume_job(str(user_id))
     elif result == "no":
         query.edit_message_text("Yah")
     elif result == "ya":
         db.successful(user_id, "sudah")
+        db.respons(user_id, delete=True)
         text = ""
         for i in sorted(db.check_result(user_id)):
             # latin = base64.b64decode(i[1].strip("b''")).decode()
-            text += (
-                f"`No     => {i[0]}\nSurah  => {i[1]}\nStatus => {i[2]}`\n\n"
-            )
+                text += f"`No     => {i[0]}\nSurah  => {i[1]}\nStatus => {i[2]}`\n\n"
         query.edit_message_text(text)
         if j.get_job(str(user_id)):
             j.resume_job(str(user_id))
@@ -90,9 +91,7 @@ def on(update, context):
     if db.getme(user_id):
         update.message.reply_text("sudah")
     else:
-        update.message.reply_text(
-            "Oke", reply_markup=KeyboardMarkup(reply_markup)
-        )
+        update.message.reply_text("Oke", reply_markup=KeyboardMarkup(reply_markup))
         db.insertme(user_id)
 
 
@@ -104,9 +103,7 @@ def showup(update, context):
         if j.get_job(str(user_id)):
             text = "Anda sudah mulai"
         else:
-            j.add_job(
-                call, "interval", hours=2, args=(user_id,), id=str(user_id)
-            )
+            j.add_job(call, "interval", hours=2, args=(user_id,), id=str(user_id))
             text = "Memulai"
         update.message.reply_text(text)
     else:
@@ -121,9 +118,7 @@ def startall(update, context):
     if db.getid():
         for i in db.getid():
             if not j.get_job(str(i[0])):
-                j.add_job(
-                    call, "interval", hours=2, args=(int(i[0]),), id=str(i[0])
-                )
+                j.add_job(call, "interval", hours=2, args=(int(i[0]),), id=str(i[0]))
     else:
         print("h")
 
@@ -150,9 +145,7 @@ def delme(update, context):
     except JobLookupError:
         text = "Anda sudah tidak mengikuti"
     if db.check_proses(user.id):
-        text += "\nTapi proses hafalan %s masih saya ingat yaa" % (
-            user.first_name
-        )
+        text += "\nTapi proses hafalan %s masih saya ingat yaa" % (user.first_name)
     update.message.reply_text(text, reply_markup=reply_markup)
 
 
@@ -170,9 +163,7 @@ def main():
         MessageHandler(Filters.text("Mengikuti"), on, run_async=True)
     )
     dispatcher.add_handler(
-        MessageHandler(
-            Filters.text("Berhenti mengikuti"), delme, run_async=True
-        )
+        MessageHandler(Filters.text("Berhenti mengikuti"), delme, run_async=True)
     )
     dispatcher.add_handler(
         MessageHandler(Filters.text("Mulai"), showup, run_async=True)
