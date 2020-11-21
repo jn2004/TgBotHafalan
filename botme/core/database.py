@@ -5,7 +5,7 @@ import psycopg2
 
 from telegram import InlineKeyboardMarkup as Markup
 
-from botme.costum import Button
+from .costum import Button
 
 
 class Database:
@@ -81,7 +81,7 @@ class Database:
         n = [i[0] for i in self.cursor.fetchall()]
         if len(n) == 1:
             n += [0]
-        with sqlite3.connect("botme/new.db") as db:
+        with sqlite3.connect("../new.db") as db:
             surah = [i for i in db.cursor().execute(sql.format(tuple(n)))]
         button = list(
             map(
@@ -108,7 +108,7 @@ class Database:
         sql = """
             SELECT latin FROM surah
             WHERE no = %s """
-        with sqlite3.connect("botme/new.db") as db:
+        with sqlite3.connect("../new.db") as db:
             for i in db.cursor().execute(sql % no):
                 # latin = base64.b64encode(i[0].encode())
                 self.cursor.execute(
@@ -163,7 +163,7 @@ class Database:
 
     def getid(self):
         self.cursor.execute("SELECT * FROM process_users")
-        return self.cursor.fetchone()
+        return self.cursor.fetchall()
 
     def respons(self, user_id, delete=False):
         if delete:
