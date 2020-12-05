@@ -15,7 +15,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 defaults = Defaults(
-    parse_mode=ParseMode.MARKDOWN, tzinfo=timezone("Asia/Jakarta")
+    parse_mode=ParseMode.MARKDOWN,
+    tzinfo=timezone("Asia/Jakarta"),
+    run_async=True,
 )
 updater = Updater(token=TOKEN, defaults=defaults)
 dispatcher = updater.dispatcher

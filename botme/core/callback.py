@@ -36,7 +36,9 @@ def callback(update, context):
         text = ""
         for i in sorted(db.check_result(user_id)):
             # latin = base64.b64decode(i[1].strip("b''")).decode()
-            text += f"`No     => {i[0]}\nSurah  => {i[1]}\nStatus => {i[2]}`\n\n"
+            text += (
+                f"`No     => {i[0]}\nSurah  => {i[1]}\nStatus => {i[2]}`\n\n"
+            )
         query.edit_message_text(text)
         if j.get_job(str(user_id)):
             j.resume_job(str(user_id))
@@ -52,4 +54,4 @@ def callback(update, context):
             query.edit_message_text("oke")
 
 
-dispatcher.add_handler(CallbackQueryHandler(callback, pattern=r"call_", run_async=True))
+dispatcher.add_handler(CallbackQueryHandler(callback, pattern=r"call_"))

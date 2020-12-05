@@ -120,15 +120,9 @@ def alll(update, context):
     update.message.reply_text("Gunakan perintah yang tersedia")
 
 
-dispatcher.add_handler(CommandHandler("start", start, run_async=True))
-dispatcher.add_handler(
-    MessageHandler(Filters.text("Mengikuti"), on, run_async=True)
-)
-dispatcher.add_handler(
-    MessageHandler(Filters.text("Berhenti mengikuti"), delme, run_async=True)
-)
-dispatcher.add_handler(
-    MessageHandler(Filters.text("Mulai"), showup, run_async=True)
-)
-dispatcher.add_handler(CommandHandler("upload", file, run_async=True))
-dispatcher.add_handler(MessageHandler(Filters.all, alll, run_async=True))
+dispatcher.add_handler(CommandHandler("start", start))
+dispatcher.add_handler(MessageHandler(Filters.text("Mengikuti"), on))
+dispatcher.add_handler(MessageHandler(Filters.text("Berhenti mengikuti"), delme))
+dispatcher.add_handler(MessageHandler(Filters.text("Mulai"), showup))
+dispatcher.add_handler(CommandHandler("upload", file))
+dispatcher.add_handler(MessageHandler(Filters.all, alll))
