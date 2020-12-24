@@ -4,7 +4,7 @@ from botme import logger
 os.chdir("botme/core")
 
 
-def _modules():
+def modules():
     _all = (
         i.replace(".py", "")
         for i in os.listdir()
@@ -14,5 +14,5 @@ def _modules():
     return _all
 
 
-modules = list(tuple(_modules()))
+modules = list(tuple(modules()))
 logger.info(f"Berhasil menghidupkan {len(modules)} modul : {modules}")

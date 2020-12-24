@@ -1,9 +1,10 @@
 import random
 import sqlite3
+import datetime
 
 import psycopg2
 
-from telegram import InlineKeyboardMarkup as Markup
+from telegram import InlineKeyboardMarkup
 
 from .costum import Button
 
@@ -11,6 +12,9 @@ from .costum import Button
 class Database:
     def __init__(self):
         self.connect = psycopg2.connect(
+            # host="localhost",
+            # user="u0_a203",
+            # database="mydb"
             host="ec2-54-237-155-151.compute-1.amazonaws.com",
             user="xkpckogpdxvslg",
             password="5c99eb9300a66c724dfafb22ae66d06abe0f5905650bd7a1568d4a19056d1120",
@@ -19,34 +23,82 @@ class Database:
         self.connect.set_session(autocommit=True)
         self.cursor = self.connect.cursor()
 
+    def _status_time(self, db_timestamp):
+        ts = datetime.datetime.now() - datetime.datetime.fromtimestamp(
+            float(db_timestamp)
+        )
+        day = ts.days if ts.days else ""
+        hour = round(ts.total_seconds() / 3600, 1)
+        minute = round(ts.seconds / 60, 1)
+        second = ts.seconds
+        if ".0" in str(hour):
+            hour = int(hour)
+        if ".0" in str(minute):
+            minute = int(minute)
+
+        return f"{day}/{hour}/{minute}/{second}"
+
+    def _build_surah_button(self, surah):
+        surah_button = map(
+            lambda x: [
+                Button(surah[x][1], f"call_arabic1{str(surah[x][0])}"),
+                Button(surah[x][3], f"call_arabic2{surah[x][0]}"),
+                Button(surah[x][2], f"call_ayat{x}"),
+            ],
+            {random.randint(0, len(surah) - 1) for _ in range(5)},
+        )
+        markup = InlineKeyboardMarkup(
+            [
+                [
+                    Button("Surah", "call_headerSurah"),
+                    Button("Arabic", "call_headerArabic"),
+                    Button("Jumlah", "call_headerTotal"),
+                ],
+                *surah_button,
+                [Button("Refresh/Segarkan", "call_ok")],
+            ]
+        )
+        return markup
+
     def table(self):
-        t1 = """
+        self.cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS users (
                 user_id INT
             )"""
-        t2 = """
+        )
+        self.cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS process_users (
                 user_id INT,
                 surah VARCHAR(30),
-                no INT
+                no INT,
+                timestamp FLOAT
             )"""
-        t3 = """
+        )
+        self.cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS result_users (
                 user_id INT,
                 surah VARCHAR(30),
                 no INT,
-                status VARCHAR(10)
+                status VARCHAR
             )"""
-        t4 = """
+        )
+        self.cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS respons (
                 user_id INT,
                 total INT
-            )
-        """
-        self.cursor.execute(t1)
-        self.cursor.execute(t2)
-        self.cursor.execute(t3)
-        self.cursor.execute(t4)
+            )"""
+        )
+        self.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS interval (
+                user_id INT,
+                interval INT
+            )"""
+        )
 
     def check_proses(self, user_id):
         self.cursor.execute(
@@ -81,56 +133,39 @@ class Database:
         n = [i[0] for i in self.cursor.fetchall()]
         if len(n) == 1:
             n += [0]
-        with sqlite3.connect("../new.db") as db:
+        with sqlite3.connect("../list_surah.db") as db:
             surah = [i for i in db.cursor().execute(sql.format(tuple(n)))]
-        button = list(
-            map(
-                lambda n: [
-                    Button(surah[n][1], f"call_arabic1{str(surah[n][0])}"),
-                    Button(surah[n][3], f"call_arabic2{surah[n][0]}"),
-                    Button(surah[n][2], f"call_ayat{n}"),
-                ],
-                list({random.randint(0, len(surah) - 1) for i in range(4)}),
-            )
-        )
-        return Markup(
-            [
-                [
-                    Button("Surah", "call_elaSurah"),
-                    Button("Arabic", "call_elaArabic"),
-                    Button("Jumlah", "call_elaTotal"),
-                ],
-                *button,
-            ]
-        )
+            return self._build_surah_button(surah)
 
     def insert_process_id(self, user_id, no):
         sql = """
             SELECT latin FROM surah
             WHERE no = %s """
-        with sqlite3.connect("../new.db") as db:
+        timestamp = datetime.datetime.now().timestamp()
+
+        with sqlite3.connect("../list_surah.db") as db:
             for i in db.cursor().execute(sql % no):
-                # latin = base64.b64encode(i[0].encode())
                 self.cursor.execute(
                     f"""
-                    INSERT INTO process_users(user_id, surah, no)
-                    VALUES ({user_id}, '{i[0]}', {no}) """
+                    INSERT INTO process_users(user_id, surah, no, timestamp)
+                    VALUES ({user_id}, '{i[0]}', {no}, {timestamp}) """
                 )
 
-    def successful(self, user_id, status):
+    def successful(self, user_id):
         self.cursor.execute(
             f"""
-            SELECT user_id, surah, no
+            SELECT user_id, surah, no, timestamp
             FROM process_users
             WHERE user_id = {user_id} """
         )
 
-        usr, surah, name = self.cursor.fetchone()
+        db_user_id, db_surah, db_name, db_timestamp = self.cursor.fetchone()
+        status = self._status_time(db_timestamp)
 
         self.cursor.execute(
             f"""
             INSERT INTO result_users
-            VALUES ({usr}, '{surah}', {name}, '{status}') """
+            VALUES ({db_user_id}, '{db_surah}', {db_name}, '{status}') """
         )
         self.cursor.execute(
             f"""
@@ -159,6 +194,12 @@ class Database:
             f"""
             DELETE FROM users
             WHERE user_id = {user_id} """
+        )
+        self.cursor.execute(
+            f"""
+            DELETE FROM interval
+            WHERE user_id = {user_id}
+            """
         )
 
     def getid(self):
@@ -192,6 +233,33 @@ class Database:
                     f"""INSERT INTO respons
                     VALUES({user_id}, 1)"""
                 )
+
+    def interval(self, user_id, method, INTERVAL=1, opt=None):
+        if method == "CHANGE":
+            interval = self.interval(user_id, "GET")[1]
+            if opt:  # naik
+                interval += INTERVAL
+            else:  # turun
+                interval -= INTERVAL
+            self.cursor.execute(
+                f"""UPDATE interval SET interval = {interval}
+                WHERE user_id = {user_id}
+                """
+            )
+
+        elif method == "PUSH":
+            self.cursor.execute(
+                f"""INSERT INTO interval(user_id, interval)
+                VALUES ({user_id}, 5)
+                """
+            )
+        elif method == "GET":
+            self.cursor.execute(
+                f"""SELECT * FROM interval
+                WHERE user_id = {user_id}
+                """
+            )
+            return self.cursor.fetchone()
 
 
 db = Database()

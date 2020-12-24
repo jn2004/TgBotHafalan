@@ -1,3 +1,3 @@
-__pycache__
-botme/__pycache__
-botme/core/__pycache__
+__pycache__/*
+botme/__pycache__/*
+botme/core/__pycache__/*

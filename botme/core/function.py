@@ -7,24 +7,32 @@ from telegram.ext import (
     Filters,
 )
 
-from .database import db
-from .costum import Button, KeyboardMarkup
-
 from botme import dispatcher, j, updater
+from .database import db
+from .costum import Button, KeyboardMarkup, text_status
+
 
 OWNER = [1328007524, 1399167510]
 
 
-def call(user_id):
-    ps = db.check_proses(user_id)
+# def status(update, context):
+#     """untuk mengecek hasil dari hafalan"""
+#     user_id = update.effective_user.id
+#     text = "".join(text_status(db, user_id))
+#     update.message.reply_text(text)
 
-    if ps:
+
+def ask(user_id):
+    """fungsi untuk menanyakan tugas yang dilakukan bot kepada user"""
+    process = db.check_proses(user_id)
+
+    if process:
         reply_markup = Markup(
             [[Button("Ya", "call_ya"), Button("Tidak", "call_tidak")]]
         )
         updater.bot.send_message(
             chat_id=user_id,
-            text=f"Sudah apa belum menghafal surah {ps[1]}?",
+            text=f"Sudah apa belum menghafal surah {process[1]}?",
             reply_markup=reply_markup,
         )
         if j.get_job(str(user_id)):
@@ -40,9 +48,11 @@ def call(user_id):
         )
 
 
-def on(update, context):
+def following(update, context):
+    """fungsi ketika user sudah mengikuti bot ini"""
     user_id = update.effective_user.id
-    reply_markup = [["Mulai"], ["Berhenti mengikuti"]]
+    reply_markup = [["Mulai"], ["Status"], ["Berhenti mengikuti"]]
+
     if db.getme(user_id):
         update.message.reply_text("sudah")
     else:
@@ -52,16 +62,29 @@ def on(update, context):
         db.insertme(user_id)
 
 
-def showup(update, context):
+def start_task(update, context):
+    """Awalan memulai tugas untuk menghafal surah"""
     user_id = update.effective_user.id
+    while True:
+        hours = db.interval(user_id, method="GET")
+        if hours:
+            break
+        else:
+            db.interval(user_id, method="PUSH")
+            hours = db.interval(user_id, method="GET")
+            break
     if db.getme(user_id):
         if user_id in OWNER:
-            call(user_id)
+            ask(user_id)
         if j.get_job(str(user_id)):
             text = "Anda sudah mulai"
         else:
             j.add_job(
-                call, "interval", hours=10, args=(user_id,), id=str(user_id)
+                ask,
+                "interval",
+                hours=int(hours[1]),
+                args=(user_id,),
+                id=str(user_id),
             )
             text = "Memulai"
         update.message.reply_text(text)
@@ -69,7 +92,22 @@ def showup(update, context):
         update.message.reply_text("`user_id` tidak terdaftar")
 
 
+def start(update, context):
+    """untuk memulai bot untuk pertama kali"""
+    user = update.effective_user
+    text = f"Halo {user.first_name}.\n"
+
+    if db.getme(user.id):
+        text += "Bagaimana kabarmu?"
+        reply_markup = [["Mulai"], ["Status"], ["Berhenti mengikuti"]]
+    else:
+        text += "Sepertinya anda belum mengikuti saya."
+        reply_markup = [["Mulai"], ["Mengikuti"]]
+    update.message.reply_text(text, reply_markup=KeyboardMarkup(reply_markup))
+
+
 def startall(update, context):
+    """Memulai semua tugas, hanya pemilik!"""
     user_id = update.effective_user.id
 
     if user_id not in OWNER:
@@ -78,27 +116,17 @@ def startall(update, context):
         for i in db.getid():
             if not j.get_job(str(i[0])):
                 j.add_job(
-                    call, "interval", hours=10, args=(int(i[0]),), id=str(i[0])
+                    ask, "interval", hours=10, args=(int(i[0]),), id=str(i[0])
                 )
     else:
-        print("h")
-
-
-def start(update, context):
-    user = update.effective_user
-    text = f"Halo {user.first_name}.\n"
-    if db.getme(user.id):
-        text += "Bagaimana kabarmu?"
-        reply_markup = [["Mulai"], ["Berhenti mengikuti"]]
-    else:
-        text += "Sepertinya anda belum mengikuti saya."
-        reply_markup = [["Mulai"], ["Mengikuti"]]
-    update.message.reply_text(text, reply_markup=KeyboardMarkup(reply_markup))
+        print("key")
 
 
 def delme(update, context):
+    """fungsi ketika user hendak berhenti mengikuti bot"""
     reply_markup = KeyboardMarkup([["Mengikuti"]])
     user = update.effective_user
+
     try:
         db.delme(user.id)
         j.remove_job(str(user.id))
@@ -106,23 +134,54 @@ def delme(update, context):
     except JobLookupError:
         text = "Anda sudah tidak mengikuti"
     if db.check_proses(user.id):
-        text += "\nTapi proses hafalan %s masih saya ingat yaa" % (
-            user.first_name
-        )
+        text += f"\nTapi proses hafalan {user.first_name} masih saya ingat yaa"
     update.message.reply_text(text, reply_markup=reply_markup)
 
 
-def file(update, context):
-    update.message.reply_document(open("botme/new.db", "rb"))
+def status(update, context):
+    """cek status user"""
+    if context:
+        query = False
+        user = update.message.from_user
+    else:
+        query = True
+        user = update.from_user
+    result = db.check_result(user.id)
+    jeda = db.interval(user.id, method="GET")[1]
+    text = f"Nama: {user.first_name} "
+    if user.last_name:
+        text += user.last_name
+    reply_markup = Markup(
+        [
+            [
+                Button("Hafalan: ", "call_total"),
+                Button(str(len(result)), "call_total"),
+                Button("Cek", "call_cek"),
+            ],
+            [
+                Button("Jeda waktu", "call_jeda"),
+                Button(str(jeda), "call_jeda"),
+                Button("+", "call_up"),
+                Button("-", "call_down"),
+            ],
+        ]
+    )
+    if query:
+        update.edit_message_text(text, reply_markup=reply_markup)
+    else:
+        update.message.reply_text(text, reply_markup=reply_markup)
 
 
-def alll(update, context):
+def echo(update, context):
+    """fungsi ketika bot tidak tahu perintah user"""
     update.message.reply_text("Gunakan perintah yang tersedia")
 
 
 dispatcher.add_handler(CommandHandler("start", start))
-dispatcher.add_handler(MessageHandler(Filters.text("Mengikuti"), on))
-dispatcher.add_handler(MessageHandler(Filters.text("Berhenti mengikuti"), delme))
-dispatcher.add_handler(MessageHandler(Filters.text("Mulai"), showup))
-dispatcher.add_handler(CommandHandler("upload", file))
-dispatcher.add_handler(MessageHandler(Filters.all, alll))
+dispatcher.add_handler(MessageHandler(Filters.text("Mengikuti"), following))
+dispatcher.add_handler(
+    MessageHandler(Filters.text("Berhenti mengikuti"), delme)
+)
+dispatcher.add_handler(MessageHandler(Filters.text("Mulai"), start_task))
+dispatcher.add_handler(MessageHandler(Filters.text("Status"), status))
+dispatcher.add_handler(MessageHandler(Filters.all, echo))

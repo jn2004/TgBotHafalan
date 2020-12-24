@@ -10,14 +10,14 @@ OWNER = [1328007524, 1399167510]
 def error_handler(update, context):
     try:
         raise context.error
-    except Conflict:
+    except:
         if db.getid():
             for i in db.getid():
                 if not j.get_job(str(i[0])):
                     j.add_job(
-                        function.call,
+                        function.ask,
                         "interval",
-                        hours=2,
+                        hours=db.interval(i[0], "GET")[1],
                         args=(int(i[0]),),
                         id=str(i[0]),
                     )
