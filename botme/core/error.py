@@ -10,7 +10,7 @@ OWNER = [1328007524, 1399167510]
 def error_handler(update, context):
     try:
         raise context.error
-    except:
+    except Conflict:
         if db.getid():
             for i in db.getid():
                 if not j.get_job(str(i[0])):
