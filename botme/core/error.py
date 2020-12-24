@@ -9,7 +9,7 @@ OWNER = [1328007524, 1399167510]
 
 def error_handler(update, context):
     try:
-        raise context.error
+        print(context.error)
     except Conflict:
         if db.getid():
             for i in db.getid():
@@ -23,11 +23,12 @@ def error_handler(update, context):
                     )
         else:
             print("h")
-
-        context.bot.send_message(
-            chat_id=OWNER[0],
-            text=str(context.error),
-        )
+    except:
+        print(context.error)
+    context.bot.send_message(
+        chat_id=OWNER[0],
+        text=str(context.error),
+    )
 
 
 dispatcher.add_error_handler(error_handler)

@@ -96,7 +96,14 @@ def start(update, context):
     """untuk memulai bot untuk pertama kali"""
     user = update.effective_user
     text = f"Halo {user.first_name}.\n"
-
+    while True:
+        hours = db.interval(user.id, method="GET")
+        if hours:
+            break
+        else:
+            db.interval(user.id, method="PUSH")
+            # hours = db.interval(user.id, method="GET")
+            break
     if db.getme(user.id):
         text += "Bagaimana kabarmu?"
         reply_markup = [["Mulai"], ["Status"], ["Berhenti mengikuti"]]
