@@ -153,6 +153,14 @@ def status(update, context):
     else:
         query = True
         user = update.from_user
+    while True:
+        hours = db.interval(user.id, method="GET")
+        if hours:
+            break
+        else:
+            db.interval(user.id, method="PUSH")
+            # hours = db.interval(user.id, method="GET")
+            break
     result = db.check_result(user.id)
     jeda = db.interval(user.id, method="GET")[1]
     text = f"Nama: {user.first_name} "
