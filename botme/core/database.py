@@ -6,20 +6,13 @@ import psycopg2
 
 from telegram import InlineKeyboardMarkup
 
+from botme import DATABASE_URL
 from .costum import Button
 
 
 class Database:
     def __init__(self):
-        self.connect = psycopg2.connect(
-            # host="localhost",
-            # user="u0_a203",
-            # database="mydb"
-            host="ec2-54-237-155-151.compute-1.amazonaws.com",
-            user="xkpckogpdxvslg",
-            password="5c99eb9300a66c724dfafb22ae66d06abe0f5905650bd7a1568d4a19056d1120",
-            database="dbjpj802sk4jrn",
-        )
+        self.connect = psycopg2.connect(DATABASE_URL)
         self.connect.set_session(autocommit=True)
         self.cursor = self.connect.cursor()
 
@@ -97,6 +90,12 @@ class Database:
             CREATE TABLE IF NOT EXISTS interval (
                 user_id INT,
                 interval INT
+            )"""
+        )
+        self.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS start_id (
+                user_id INT
             )"""
         )
 
@@ -201,7 +200,16 @@ class Database:
             WHERE user_id = {user_id}
             """
         )
+        self.cursor.execute(f"DELETE FROM start_id WHERE user_id = {user_id}")
 
+    def start(self, user_id=None, method="GET"):
+        if method == "GET":
+            self.cursor.execute(f"SELECT * FROM start_id")
+            return self.cursor.fetchall()  
+        elif method == "PUSH":
+            self.cursor.execute(f"INSERT INTO start_id VALUES({user_id})")
+            
+    
     def getid(self):
         self.cursor.execute("SELECT * FROM process_users")
         return self.cursor.fetchall()

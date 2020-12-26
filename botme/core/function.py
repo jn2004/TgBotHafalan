@@ -15,13 +15,6 @@ from .costum import Button, KeyboardMarkup, text_status
 OWNER = [1328007524, 1399167510]
 
 
-# def status(update, context):
-#     """untuk mengecek hasil dari hafalan"""
-#     user_id = update.effective_user.id
-#     text = "".join(text_status(db, user_id))
-#     update.message.reply_text(text)
-
-
 def ask(user_id):
     """fungsi untuk menanyakan tugas yang dilakukan bot kepada user"""
     process = db.check_proses(user_id)
@@ -86,6 +79,7 @@ def start_task(update, context):
                 args=(user_id,),
                 id=str(user_id),
             )
+            db.start(user_id=user_id, method="PUSH")
             text = "Memulai"
         update.message.reply_text(text)
     else:

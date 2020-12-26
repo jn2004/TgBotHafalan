@@ -1,3 +1,4 @@
+import os
 import logging
 
 from telegram import ParseMode
@@ -14,6 +15,9 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+    
 defaults = Defaults(
     parse_mode=ParseMode.MARKDOWN,
     tzinfo=timezone("Asia/Jakarta"),

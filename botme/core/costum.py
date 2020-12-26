@@ -27,18 +27,23 @@ def utimeout(query, j, job_id):
 
 
 def text_status(db, user_id):
-    for i in sorted(db.check_result(user_id)):
-        time = i[2].split("/")
-        t = ""
-        if time[0]:
-            t += f"{time[0]} hari "
-        if int(time[1][0]):
-            t += f"{time[1]} jam "
-        if int(time[2][0]):
-            t += f"{time[2]} menit "
-        else:
-            t += f"{time[3]} detik "
-        yield f"`No    => {i[0]}\nSurah => {i[1]}\nWaktu => {t}`\n\n"
+    result = sorted(db.check_result(user_id))
+    if result:
+        for i in result:
+            time = i[2].split("/")
+            t = ""
+            if time[0]:
+                t += f"{time[0]} hari "
+            if int(time[1][0]):
+                t += f"{time[1]} jam "
+            if int(time[2][0]):
+                t += f"{time[2]} menit "
+            else:
+                t += f"{time[3]} detik "
+            
+            yield f"`No    => {i[0]}\nSurah => {i[1]}\nWaktu => {t}`\n\n"
+    else:
+        yield "Sepertinya anda belum menghafal"
 
 
 def chinterval(query, db, j, status, o):
