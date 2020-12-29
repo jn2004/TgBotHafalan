@@ -9,8 +9,8 @@ def error_handler(update, context):
     try:
         raise context.error
     except:
-        raise context.error)
-        
+        raise context.error
+
     context.bot.send_message(
         chat_id=int(OWNER),
         text=str(context.error),
