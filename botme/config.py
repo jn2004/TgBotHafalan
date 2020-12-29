@@ -1,3 +1,6 @@
 import os
 
-TOKEN = os.environ.get("TOKEN", "1366337668:AAGNO1qETXJbF5oL-fEuYiZDkmy0sjVZabs")
+
+TOKEN = None  # str
+OWNER = 1399167510  # List[int]
+DATABASE_URL = None  # str

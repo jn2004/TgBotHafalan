@@ -7,12 +7,9 @@ from telegram.ext import (
     Filters,
 )
 
-from botme import dispatcher, j, updater
+from botme import dispatcher, j, updater, OWNER
 from .database import db
 from .costum import Button, KeyboardMarkup, text_status
-
-
-OWNER = [1328007524, 1399167510]
 
 
 def ask(user_id):
@@ -31,9 +28,7 @@ def ask(user_id):
         if j.get_job(str(user_id)):
             j.pause_job(str(user_id))
     else:
-        reply_markup = Markup(
-            [[Button("OK", "call_ok"), Button("NO", "call_no")]]
-        )
+        reply_markup = Markup([[Button("OK", "call_ok"), Button("NO", "call_no")]])
         updater.bot.send_message(
             chat_id=user_id,
             text="Luangkan waktu untuk menghafal Al-Quran ya",
@@ -49,9 +44,7 @@ def following(update, context):
     if db.getme(user_id):
         update.message.reply_text("sudah")
     else:
-        update.message.reply_text(
-            "Oke", reply_markup=KeyboardMarkup(reply_markup)
-        )
+        update.message.reply_text("Oke", reply_markup=KeyboardMarkup(reply_markup))
         db.insertme(user_id)
 
 
@@ -67,7 +60,7 @@ def start_task(update, context):
             hours = db.interval(user_id, method="GET")
             break
     if db.getme(user_id):
-        if user_id in OWNER:
+        if user_id == OWNER:
             ask(user_id)
         if j.get_job(str(user_id)):
             text = "Anda sudah mulai"
@@ -111,14 +104,12 @@ def startall(update, context):
     """Memulai semua tugas, hanya pemilik!"""
     user_id = update.effective_user.id
 
-    if user_id not in OWNER:
+    if user_id != OWNER:
         return
     if db.getid():
         for i in db.getid():
             if not j.get_job(str(i[0])):
-                j.add_job(
-                    ask, "interval", hours=10, args=(int(i[0]),), id=str(i[0])
-                )
+                j.add_job(ask, "interval", hours=10, args=(int(i[0]),), id=str(i[0]))
     else:
         print("key")
 
@@ -188,9 +179,7 @@ def echo(update, context):
 
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(MessageHandler(Filters.text("Mengikuti"), following))
-dispatcher.add_handler(
-    MessageHandler(Filters.text("Berhenti mengikuti"), delme)
-)
+dispatcher.add_handler(MessageHandler(Filters.text("Berhenti mengikuti"), delme))
 dispatcher.add_handler(MessageHandler(Filters.text("Mulai"), start_task))
 dispatcher.add_handler(MessageHandler(Filters.text("Status"), status))
 dispatcher.add_handler(MessageHandler(Filters.all, echo))

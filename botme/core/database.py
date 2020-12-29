@@ -205,11 +205,10 @@ class Database:
     def start(self, user_id=None, method="GET"):
         if method == "GET":
             self.cursor.execute(f"SELECT * FROM start_id")
-            return self.cursor.fetchall()  
+            return self.cursor.fetchall()
         elif method == "PUSH":
             self.cursor.execute(f"INSERT INTO start_id VALUES({user_id})")
-            
-    
+
     def getid(self):
         self.cursor.execute("SELECT * FROM process_users")
         return self.cursor.fetchall()
