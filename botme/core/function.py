@@ -60,8 +60,6 @@ def start_task(update, context):
             hours = db.interval(user_id, method="GET")
             break
     if db.getme(user_id):
-        if user_id == OWNER:
-            ask(user_id)
         if j.get_job(str(user_id)):
             text = "Anda sudah mulai"
         else:
@@ -89,7 +87,6 @@ def start(update, context):
             break
         else:
             db.interval(user.id, method="PUSH")
-            # hours = db.interval(user.id, method="GET")
             break
     if db.getme(user.id):
         text += "Bagaimana kabarmu?"
@@ -98,20 +95,6 @@ def start(update, context):
         text += "Sepertinya anda belum mengikuti saya."
         reply_markup = [["Mulai"], ["Mengikuti"]]
     update.message.reply_text(text, reply_markup=KeyboardMarkup(reply_markup))
-
-
-def startall(update, context):
-    """Memulai semua tugas, hanya pemilik!"""
-    user_id = update.effective_user.id
-
-    if user_id != OWNER:
-        return
-    if db.getid():
-        for i in db.getid():
-            if not j.get_job(str(i[0])):
-                j.add_job(ask, "interval", hours=10, args=(int(i[0]),), id=str(i[0]))
-    else:
-        print("key")
 
 
 def delme(update, context):
@@ -144,7 +127,6 @@ def status(update, context):
             break
         else:
             db.interval(user.id, method="PUSH")
-            # hours = db.interval(user.id, method="GET")
             break
     result = db.check_result(user.id)
     jeda = db.interval(user.id, method="GET")[1]

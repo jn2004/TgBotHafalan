@@ -1,6 +1,3 @@
-import os
-
-
-TOKEN = None  # str
-OWNER = 1399167510  # List[int]
-DATABASE_URL = None  # str
+TOKEN = None
+OWNER = 1399167510
+DATABASE_URL = None
