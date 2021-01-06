@@ -1,18 +1,13 @@
-import os
+import re
+import glob
+
 from botme import logger
 
-os.chdir("botme/core")
 
+def get_modules():
+    for i in glob.glob("*/*/*.py"):
+        if not i.endswith("__init__.py"):
+            yield re.sub(r".+/|.py", "", i)
 
-def modules():
-    _all = (
-        i.replace(".py", "")
-        for i in os.listdir()
-        if "__init__.py" not in i and i.endswith(".py")
-    )
-
-    return _all
-
-
-modules = list(tuple(modules()))
+modules = list(tuple(get_modules()))
 logger.info(f"Berhasil menghidupkan {len(modules)} modul : {modules}")
