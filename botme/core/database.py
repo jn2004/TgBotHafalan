@@ -63,9 +63,9 @@ class Database:
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS process_users (
-                user_id INT,
-                surah VARCHAR(30),
-                no INT,
+                user_id   INT,
+                surah     VARCHAR(30),
+                no        INT,
                 timestamp FLOAT
             )"""
         )
@@ -73,22 +73,22 @@ class Database:
             """
             CREATE TABLE IF NOT EXISTS result_users (
                 user_id INT,
-                surah VARCHAR(30),
-                no INT,
-                status VARCHAR
+                surah   VARCHAR(30),
+                no      INT,
+                status  VARCHAR
             )"""
         )
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS respons (
                 user_id INT,
-                total INT
+                total   INT
             )"""
         )
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS interval (
-                user_id INT,
+                user_id  INT,
                 interval INT
             )"""
         )
