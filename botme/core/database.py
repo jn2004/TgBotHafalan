@@ -34,7 +34,7 @@ class Database:
     def _build_surah_button(self, surah):
         surah_button = map(
             lambda x: [
-                Button(surah[x][1], f"call_arabic1{str(surah[x][0])}"),
+                Button(surah[x][1], f"call_arabic1{surah[x][0]}"),
                 Button(surah[x][3], f"call_arabic2{surah[x][0]}"),
                 Button(surah[x][2], f"call_ayat{x}"),
             ],
