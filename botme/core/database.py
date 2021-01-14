@@ -6,7 +6,7 @@ import psycopg2
 
 from telegram import InlineKeyboardMarkup
 
-from botme import DATABASE_URL
+from botme import DATABASE_URL, logger
 from .costum import Button
 
 
@@ -132,7 +132,7 @@ class Database:
         n = [i[0] for i in self.cursor.fetchall()]
         if len(n) == 1:
             n += [0]
-        with sqlite3.connect("../list_surah.db") as db:
+        with sqlite3.connect("botme/list_surah.db") as db:
             surah = [i for i in db.cursor().execute(sql.format(tuple(n)))]
             return self._build_surah_button(surah)
 

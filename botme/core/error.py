@@ -17,4 +17,4 @@ def error_handler(update, context):
     )
 
 
-dispatcher.add_error_handler(error_handler)
+# dispatcher.add_error_handler(error_handler)

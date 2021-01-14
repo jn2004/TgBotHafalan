@@ -62,6 +62,8 @@ def start_task(update, context):
     if db.getme(user_id):
         if j.get_job(str(user_id)):
             text = "Anda sudah mulai"
+        if user_id == OWNER:
+            ask(user_id)
         else:
             j.add_job(
                 ask,
