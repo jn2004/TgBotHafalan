@@ -13,7 +13,7 @@ def error_handler(update, context):
 
     context.bot.send_message(
         chat_id=int(OWNER),
-        text=str(context.error),
+        text=f"Saya terjadi error:(\n`{context.error}`",
     )
 
 
