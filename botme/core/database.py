@@ -142,7 +142,7 @@ class Database:
             WHERE no = %s """
         timestamp = datetime.datetime.now().timestamp()
 
-        with sqlite3.connect("../list_surah.db") as db:
+        with sqlite3.connect("botme/list_surah.db") as db:
             for i in db.cursor().execute(sql % no):
                 self.cursor.execute(
                     f"""
