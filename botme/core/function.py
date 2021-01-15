@@ -60,6 +60,8 @@ def start_task(update, context):
             hours = db.interval(user_id, method="GET")
             break
     if db.getme(user_id):
+        if user_id == int(OWNER):
+            ask(user_id)
         if j.get_job(str(user_id)):
             text = "Anda sudah mulai"
         else:
