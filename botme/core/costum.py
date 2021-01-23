@@ -25,7 +25,7 @@ def utimeout(query, j, job_id):
 
 
 def text_status(db, user_id):
-    result = db.check_result(user_id).sort()
+    result = sorted(db.check_result(user_id))
     if result:
         for i in result:
             time = i[2].split("/")
