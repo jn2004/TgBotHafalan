@@ -9,5 +9,6 @@ def get_modules():
         if not i.endswith("__init__.py"):
             yield re.sub(r".+/|.py", "", i)
 
+
 modules = list(tuple(get_modules()))
 logger.info(f"Berhasil menghidupkan {len(modules)} modul : {modules}")

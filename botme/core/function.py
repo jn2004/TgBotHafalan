@@ -28,7 +28,9 @@ def ask(user_id):
         if j.get_job(str(user_id)):
             j.pause_job(str(user_id))
     else:
-        reply_markup = Markup([[Button("OK", "call_ok"), Button("NO", "call_no")]])
+        reply_markup = Markup(
+            [[Button("OK", "call_ok"), Button("NO", "call_no")]]
+        )
         updater.bot.send_message(
             chat_id=user_id,
             text="Luangkan waktu untuk menghafal Al-Quran ya",
@@ -44,7 +46,9 @@ def following(update, context):
     if db.getme(user_id):
         update.message.reply_text("sudah")
     else:
-        update.message.reply_text("Oke", reply_markup=KeyboardMarkup(reply_markup))
+        update.message.reply_text(
+            "Oke", reply_markup=KeyboardMarkup(reply_markup)
+        )
         db.insertme(user_id)
 
 
@@ -163,7 +167,9 @@ def echo(update, context):
 
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(MessageHandler(Filters.text("Mengikuti"), following))
-dispatcher.add_handler(MessageHandler(Filters.text("Berhenti mengikuti"), delme))
+dispatcher.add_handler(
+    MessageHandler(Filters.text("Berhenti mengikuti"), delme)
+)
 dispatcher.add_handler(MessageHandler(Filters.text("Mulai"), start_task))
 dispatcher.add_handler(MessageHandler(Filters.text("Status"), status))
 dispatcher.add_handler(MessageHandler(Filters.all, echo))

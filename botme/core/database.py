@@ -6,7 +6,7 @@ import psycopg2
 
 from telegram import InlineKeyboardMarkup
 
-from botme import DATABASE_URL, logger
+from botme import logger, DATABASE_URL, TZ
 from .costum import Button
 
 
@@ -15,21 +15,6 @@ class Database:
         self.connect = psycopg2.connect(DATABASE_URL)
         self.connect.set_session(autocommit=True)
         self.cursor = self.connect.cursor()
-
-    def _status_time(self, db_timestamp):
-        ts = datetime.datetime.now() - datetime.datetime.fromtimestamp(
-            float(db_timestamp)
-        )
-        day = ts.days if ts.days else ""
-        hour = round(ts.total_seconds() / 3600, 1)
-        minute = round(ts.seconds / 60, 1)
-        second = ts.seconds
-        if ".0" in str(hour):
-            hour = int(hour)
-        if ".0" in str(minute):
-            minute = int(minute)
-
-        return f"{day}/{hour}/{minute}/{second}"
 
     def _build_surah_button(self, surah):
         surah_button = map(
@@ -66,7 +51,7 @@ class Database:
                 user_id   INT,
                 surah     VARCHAR(30),
                 no        INT,
-                timestamp FLOAT
+                time TIMESTAMP
             )"""
         )
         self.cursor.execute(
@@ -140,31 +125,31 @@ class Database:
         sql = """
             SELECT latin FROM surah
             WHERE no = %s """
-        timestamp = datetime.datetime.now().timestamp()
 
         with sqlite3.connect("botme/list_surah.db") as db:
             for i in db.cursor().execute(sql % no):
                 self.cursor.execute(
                     f"""
-                    INSERT INTO process_users(user_id, surah, no, timestamp)
-                    VALUES ({user_id}, '{i[0]}', {no}, {timestamp}) """
+                    INSERT INTO process_users(user_id, surah, no, time)
+                    VALUES ({user_id}, '{i[0]}', {no}, now()) """
                 )
 
     def successful(self, user_id):
         self.cursor.execute(
             f"""
-            SELECT user_id, surah, no, timestamp
+            SELECT user_id, surah, no
             FROM process_users
             WHERE user_id = {user_id} """
         )
 
-        db_user_id, db_surah, db_name, db_timestamp = self.cursor.fetchone()
-        status = self._status_time(db_timestamp)
-
         self.cursor.execute(
             f"""
             INSERT INTO result_users
-            VALUES ({db_user_id}, '{db_surah}', {db_name}, '{status}') """
+            VALUES ({str(self.cursor.fetchone())[1:-1]}, (
+                SELECT regexp_replace((
+                    now() - (SELECT time FROM process_users)
+                    )::INTERVAL::TEXT, '@\s|\.\d+', '', 'g')
+            )) """
         )
         self.cursor.execute(
             f"""
@@ -271,3 +256,5 @@ class Database:
 
 db = Database()
 db.table()
+db.cursor.execute(f"SET timezone TO '{TZ}'")
+db.cursor.execute("SET intervalstyle TO postgres_verbose")

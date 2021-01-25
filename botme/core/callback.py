@@ -47,7 +47,9 @@ def callback(update, context):
         chinterval(query, db, j, status, 0)
     elif result == "total" or result == "cek":
         text = "".join(text_status(db, user_id))
-        reply_markup = InlineKeyboardMarkup([[Button("Kembali", "call_status")]])
+        reply_markup = InlineKeyboardMarkup(
+            [[Button("Kembali", "call_status")]]
+        )
         query.edit_message_text(text, reply_markup=reply_markup)
     else:
         juser_id = user_id + "j"

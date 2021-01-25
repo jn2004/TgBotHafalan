@@ -9,18 +9,7 @@ for module in modules:
 
 
 def main():
-    if database.db.start(method="GET"):
-        updater.bot.send_message(chat_id=OWNER, text="Restarting...")
-        for i in database.db.start(method="GET"):
-            if not j.get_job(str(i[0])):
-                j.add_job(
-                    function.ask,
-                    "interval",
-                    hours=database.db.interval(i[0], "GET")[1],
-                    args=(i[0],),
-                    id=str(i[0]),
-                )
-
+    updater.bot.send_message(chat_id=OWNER, text="Restarting...")
     updater.start_polling()
     logger.info("Listening using polling")
 

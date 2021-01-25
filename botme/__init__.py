@@ -6,7 +6,10 @@ from telegram.ext import Updater, Defaults
 
 from pytz import timezone
 
-from botme.config import TOKEN, OWNER, DATABASE_URL
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+
+from botme.config import TOKEN, OWNER, DATABASE_URL, TZ
 
 
 logging.basicConfig(
@@ -18,6 +21,7 @@ logger = logging.getLogger(__name__)
 TOKEN = os.environ.get("TOKEN") or TOKEN
 OWNER = os.environ.get("OWNER") or OWNER
 DATABASE_URL = os.environ.get("DATABASE_URL") or DATABASE_URL
+TZ = os.environ.get("TZ", "UTC") or TZ
 
 defaults = Defaults(
     parse_mode=ParseMode.MARKDOWN, tzinfo=timezone("Asia/Jakarta"), run_async=True
@@ -25,4 +29,9 @@ defaults = Defaults(
 
 updater = Updater(token=TOKEN, defaults=defaults)
 dispatcher = updater.dispatcher
-j = updater.job_queue.scheduler
+jobstores = {
+        "default": SQLAlchemyJobStore("postgres://jordi:admin@localhost/mydb")
+        } 
+j = BackgroundScheduler(timezone=timezone("Asia/Jakarta"), jobstores=jobstores)
+j.start()
+
