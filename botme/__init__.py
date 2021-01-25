@@ -24,14 +24,14 @@ DATABASE_URL = os.environ.get("DATABASE_URL") or DATABASE_URL
 TZ = os.environ.get("TZ", "UTC") or TZ
 
 defaults = Defaults(
-    parse_mode=ParseMode.MARKDOWN, tzinfo=timezone("Asia/Jakarta"), run_async=True
+    parse_mode=ParseMode.MARKDOWN, tzinfo=timezone(TZ), run_async=True
 )
 
 updater = Updater(token=TOKEN, defaults=defaults)
 dispatcher = updater.dispatcher
 jobstores = {
-        "default": SQLAlchemyJobStore("postgres://jordi:admin@localhost/mydb")
+        "default": SQLAlchemyJobStore(DATABASE_URL)
         } 
-j = BackgroundScheduler(timezone=timezone("Asia/Jakarta"), jobstores=jobstores)
+j = BackgroundScheduler(timezone=timezone(TZ), jobstores=jobstores)
 j.start()
 
