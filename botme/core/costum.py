@@ -15,15 +15,15 @@ class Button(InlineKeyboardButton):
         super().__init__(array, callback_data=callback_data)
 
 
-def utimeout(query, j, job_id):
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Back", callback_data="call_ok")]]
-    )
+# def utimeout(query, j, job_id):
+    # reply_markup = InlineKeyboardMarkup(
+        # [[InlineKeyboardButton("Back", callback_data="call_ok")]]
+    # )
 
-    j.remove_job(job_id)
-    query.edit_message_text(
-        "Mohon untuk segera memilih", reply_markup=reply_markup
-    )
+    # j.remove_job(job_id)
+    # query.edit_message_text(
+        # "Mohon untuk segera memilih", reply_markup=reply_markup
+    # )
 
 
 def text_status(db, user_id):

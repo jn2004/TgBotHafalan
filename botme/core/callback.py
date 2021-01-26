@@ -4,7 +4,7 @@ from telegram.ext import CallbackQueryHandler
 from botme import dispatcher, j
 from .database import db
 from .function import status
-from .costum import utimeout, text_status, chinterval, Button
+from .costum import text_status, chinterval, Button
 
 
 def callback(update, context):
@@ -52,22 +52,11 @@ def callback(update, context):
         )
         query.edit_message_text(text, reply_markup=reply_markup)
     else:
-        juser_id = user_id + "j"
         if result == "ok":
             query.edit_message_text(
                 "Dipilih yak", reply_markup=db.get_surah_button(user_id)
             )
-            if not j.get_job(juser_id):
-                j.add_job(
-                    utimeout,
-                    "interval",
-                    minutes=7,
-                    args=(query, j, juser_id),
-                    id=juser_id,
-                )
         elif result[0:6] == "arabic":
-            if j.get_job(juser_id):
-                j.remove_job(juser_id)
             db.insert_process_id(user_id, result[7::])
             query.edit_message_text("Oke semoga berhasil")
 
