@@ -32,5 +32,5 @@ dispatcher = updater.dispatcher
 jobstores = {
         "default": SQLAlchemyJobStore(DATABASE_URL)
         } 
-j = BackgroundScheduler(timezone=timezone(TZ), jobstores=jobstores)
-
+updater.jobqueue.scheduler = BackgroundScheduler(timezone=timezone(TZ), jobstores=jobstores)
+j = updater.jobqueue.scheduler
