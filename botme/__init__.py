@@ -33,5 +33,4 @@ jobstores = {
         "default": SQLAlchemyJobStore(DATABASE_URL)
         } 
 j = BackgroundScheduler(timezone=timezone(TZ), jobstores=jobstores)
-j.start()
 
