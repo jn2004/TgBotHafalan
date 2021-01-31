@@ -6,6 +6,7 @@ from .database import db
 from .function import status
 from .costum import text_status, chinterval, Button
 
+j = j.scheduler
 
 def callback(update, context):
     query = update.callback_query
