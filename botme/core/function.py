@@ -12,6 +12,9 @@ from .database import db
 from .costum import Button, KeyboardMarkup, text_status
 
 
+j = j.scheduler
+
+
 def ask(user_id):
     """fungsi untuk menanyakan tugas yang dilakukan bot kepada user"""
     process = db.check_proses(user_id)
