@@ -37,7 +37,7 @@ def callback(update, context):
         query.edit_message_text(text)
         if j.get_job(user_id):
             j.resume_job(user_id)
-        elif result == "status":
+    elif result == "status":
         status(query, None)
     elif result == "up":
         chinterval(query, db, j, status, 1)
