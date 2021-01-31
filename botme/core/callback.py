@@ -37,9 +37,7 @@ def callback(update, context):
         query.edit_message_text(text)
         if j.get_job(user_id):
             j.resume_job(user_id)
-    elif db.check_proses(user_id):
-        query.edit_message_text("Proses anda sedang berlangsung")
-    elif result == "status":
+        elif result == "status":
         status(query, None)
     elif result == "up":
         chinterval(query, db, j, status, 1)
@@ -51,6 +49,8 @@ def callback(update, context):
             [[Button("Kembali", "call_status")]]
         )
         query.edit_message_text(text, reply_markup=reply_markup)
+    elif db.check_proses(user_id):
+        query.edit_message_text("Proses anda sedang berlangsung")
     else:
         if result == "ok":
             query.edit_message_text(
