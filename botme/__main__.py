@@ -10,6 +10,7 @@ for module in modules:
 
 def main():
     updater.bot.send_message(chat_id=OWNER, text="Restarting...")
+    j.start()
     updater.start_polling()
     logger.info("Listening using polling")
 
