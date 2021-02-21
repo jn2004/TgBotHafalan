@@ -9,7 +9,7 @@ from pytz import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
-from botme.config import TOKEN, OWNER, DATABASE_URL, TZ
+from botme.config import Required, Optional
 
 
 logging.basicConfig(
@@ -18,10 +18,10 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-TOKEN = os.environ.get("TOKEN") or TOKEN
-OWNER = os.environ.get("OWNER") or OWNER
-DATABASE_URL = os.environ.get("DATABASE_URL") or DATABASE_URL
-TZ = os.environ.get("TZ", "UTC") or TZ
+TOKEN = os.environ.get("TOKEN") or Required.TOKEN
+OWNER = os.environ.get("OWNER") or Required.OWNER
+DATABASE_URL = os.environ.get("DATABASE_URL") or Required.DATABASE_URL
+TZ = os.environ.get("TZ", "UTC") or Optional.TZ
 
 defaults = Defaults(
     parse_mode=ParseMode.MARKDOWN, tzinfo=timezone(TZ), run_async=True

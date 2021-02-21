@@ -1,4 +1,8 @@
-TOKEN = None 
-OWNER = 1399167510
-DATABASE_URL = None
-TZ = None
+class Required:
+    TOKEN = None
+    OWNER = None
+    DATABASE_URL = None
+
+
+class Optional:
+    TZ = None
